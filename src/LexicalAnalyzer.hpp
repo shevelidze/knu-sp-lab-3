@@ -21,9 +21,13 @@ public:
       {
         tokens.push_back(this->readWhitespace());
       }
-      else if (currentSymbol == '/')
+      else if (this->readSpecificWord("//"))
       {
-        tokens.push_back(this->readComment());
+        tokens.push_back(this->readOneLineComment());
+      }
+      else if (this->readSpecificWord("/*"))
+      {
+        tokens.push_back(this->readMultiLineComment());
       }
       else if (currentSymbol == '\'' || currentSymbol == '"')
       {
@@ -88,54 +92,46 @@ private:
     return Token(content, TokenType::WHITESPACE, false);
   }
 
-  Token readComment()
+  Token readMultiLineComment()
   {
-    this->moveForward();
-    char secondSymbol = this->peek();
-    this->moveForward();
+    std::string content = "/*";
 
-    if (secondSymbol == '*')
+    bool isInvalid = true;
+
+    while (this->peek() != EOF)
     {
-      std::string content = "/";
-      content += secondSymbol;
+      content += this->peek();
+      this->moveForward();
 
-      bool isInvalid = true;
-
-      while (this->peek() != EOF)
+      if (this->peek() == '*')
       {
         content += this->peek();
         this->moveForward();
 
-        if (this->peek() == '*')
+        if (this->peek() == '/')
         {
           content += this->peek();
           this->moveForward();
-
-          if (this->peek() == '/')
-          {
-            content += this->peek();
-            this->moveForward();
-            isInvalid = false;
-            break;
-          }
+          isInvalid = false;
+          break;
         }
       }
-
-      return Token(content, TokenType::COMMENT, isInvalid);
     }
-    else
+
+    return Token(content, TokenType::COMMENT, isInvalid);
+  }
+
+  Token readOneLineComment()
+  {
+    std::string content = "//";
+
+    while (this->peek() != EOF && !this->isEndOfLine(this->peek()))
     {
-      std::string content = "/";
-      content += secondSymbol;
-
-      while (this->peek() != EOF && !this->isEndOfLine(this->peek()))
-      {
-        content += this->peek();
-        this->moveForward();
-      }
-
-      return Token(content, TokenType::COMMENT, secondSymbol != '/');
+      content += this->peek();
+      this->moveForward();
     }
+
+    return Token(content, TokenType::COMMENT, false);
   }
 
   Token readStringLiteral()
