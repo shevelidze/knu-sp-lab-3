@@ -188,6 +188,7 @@ private:
     else
     {
       bool contentHasDot = false;
+      bool contentHasBotAtTheEnd = false;
 
       while (this->peek() != EOF && (this->isDigit(this->peek()) || this->peek() == '.'))
       {
@@ -200,19 +201,20 @@ private:
           else
           {
             contentHasDot = true;
-            isInvalid = true;
           }
+
+          contentHasBotAtTheEnd = true;
         }
         else
         {
-          isInvalid = false;
+          contentHasBotAtTheEnd = false;
         }
 
         content += this->peek();
         this->moveForward();
       }
 
-      return Token(content, TokenType::NUMBER_LITERAL, isInvalid);
+      return Token(content, TokenType::NUMBER_LITERAL, isInvalid || contentHasBotAtTheEnd);
     }
   }
 
@@ -256,7 +258,7 @@ private:
       this->moveForward();
     }
 
-    return Token(content, TokenType::OPERATOR, false);
+    return Token(content, TokenType::OPERATOR, true);
   }
 
   static bool isDigit(char symbol)
@@ -291,61 +293,62 @@ private:
 
   static std::vector<std::string> getOperators()
   {
-    std::vector<std::string> operators = {"="
-                                          "+="
-                                          "-="
-                                          "*="
-                                          "/="
-                                          "%="
-                                          "**="
-                                          "<<="
-                                          ">>="
-                                          ">>>="
-                                          "&="
-                                          "^="
-                                          "|="
-                                          "&&="
-                                          "||="
-                                          "??="
-                                          "["
-                                          "]"
-                                          "("
-                                          ")"
-                                          "{"
-                                          "}"
-                                          "."
-                                          "..."
-                                          ";"
-                                          ","
-                                          ":"
-                                          "=="
-                                          "!="
-                                          "==="
-                                          "!=="
-                                          "<"
-                                          ">"
-                                          "<="
-                                          ">="
-                                          "&"
-                                          "|"
-                                          "^"
-                                          "~"
-                                          "<<"
-                                          ">>"
-                                          ">>>"
-                                          "&&"
-                                          "||"
-                                          "!"
-                                          "%"
-                                          "++"
-                                          "--"
-                                          "+"
-                                          "-"
-                                          "*"
-                                          "/"
-                                          "**"
-                                          "?"
-                                          "??"};
+    std::vector<std::string> operators = {
+        "=",
+        "+=",
+        "-=",
+        "*=",
+        "/=",
+        "%=",
+        "**=",
+        "<<=",
+        ">>=",
+        ">>>=",
+        "&=",
+        "^=",
+        "|=",
+        "&&=",
+        "||=",
+        "\?\?=",
+        "[",
+        "]",
+        "(",
+        ")",
+        "{",
+        "}",
+        ".",
+        "...",
+        ";",
+        ",",
+        ":",
+        "==",
+        "!=",
+        "===",
+        "!==",
+        "<",
+        ">",
+        "<=",
+        ">=",
+        "&",
+        "|",
+        "^",
+        "~",
+        "<<",
+        ">>",
+        ">>>",
+        "&&",
+        "||",
+        "!",
+        "%",
+        "++",
+        "--",
+        "+",
+        "-",
+        "*",
+        "/",
+        "**",
+        "?",
+        "??"};
 
     std::sort(operators.begin(), operators.end(), [](const std::string &a, const std::string &b)
               { return a.length() > b.length(); });
