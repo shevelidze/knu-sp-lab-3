@@ -173,7 +173,10 @@ private:
 
     if (content == "0" && this->peek() == 'x')
     {
-      while (this->peek() != EOF && this->isWordSymbol(this->peek()) || this->peek() == '.')
+      content += this->peek();
+      this->moveForward();
+
+      while (this->peek() != EOF && (this->isWordSymbol(this->peek()) || this->peek() == '.'))
       {
         if (!this->isHexadecimalDigit(this->peek()))
         {
@@ -190,7 +193,7 @@ private:
     {
       bool contentHasDot = false;
 
-      while (this->peek() != EOF && this->isDigit(this->peek()) || this->peek() == '.')
+      while (this->peek() != EOF && (this->isDigit(this->peek()) || this->peek() == '.'))
       {
         if (this->peek() == '.')
         {
